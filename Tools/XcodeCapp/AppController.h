@@ -44,6 +44,8 @@
     NSImage                             *_iconWorking;
     NSStatusItem                        *_statusItem;
     PRHEmptyGrowlDelegate               *growlDelegateRef;
+    BOOL supportsFileModeListening;
+    
 }
 
 @property BOOL supportsFileModeListening;
