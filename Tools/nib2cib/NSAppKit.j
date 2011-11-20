@@ -21,6 +21,7 @@
  */
 
 @import "_NSCornerView.j"
+@import "_NSManagedProxy.j"
 @import "NSArrayController.j"
 @import "NSBox.j"
 @import "NSButton.j"

@@ -21,6 +21,7 @@
  */
 
 @import <AppKit/CPObjectController.j>
+@import <CoreData/CPManagedObject.j>
 
 @implementation CPObjectController (NSCoding)
 
@@ -33,9 +34,16 @@
         _declaredKeys = [aCoder decodeObjectForKey:@"NSDeclaredKeys"];
 
         var className = [aCoder decodeObjectForKey:@"NSObjectClassName"];
-        if (className)
+		var _isUsingManagedProxy = [aCoder decodeBoolForKey:@"_NSIsUsingManagedProxy"];
+        
+		if (className)
             _objectClassName = CP_NSMapClassName(className);
-        else
+        else if (_isUsingManagedProxy)
+			{
+				_managedProxy = [aCoder decodeObjectForKey:@"_NSManagedProxy"];
+				_objectClass = [CPManagedObject class];
+			}
+		else
             _objectClass = [CPMutableDictionary class];
 
         _isEditable = [aCoder decodeBoolForKey:@"NSEditable"];
