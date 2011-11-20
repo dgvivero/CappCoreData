@@ -22,6 +22,7 @@
 
 @import <Foundation/CPDictionary.j>
 @import <Foundation/CPCountedSet.j>
+@import <CoreData/CPManagedObjectContext.j>
 
 @import "CPController.j"
 
@@ -47,12 +48,19 @@
     BOOL            _automaticallyPreparesContent;
 
     CPCountedSet    _observedKeys;
+
+	BOOL			_isUsingManagedProxy;
+	_CPManagedProxy _managedProxy @accessors(property=managedProxy);
+	CPManagedObjectContext _managedContext @accessors(property=managedObjectContext);
+	CPPredicate     _fetchPredicate @accessors(property=fetchPredicate);
+	CPString		_entityName @accessors(property=entityName);
 }
 
 + (id)initialize
 {
     [self exposeBinding:@"editable"];
     [self exposeBinding:@"contentObject"];
+	[self exposeBinding:@"managedObjectContext"];
 }
 
 + (CPSet)keyPathsForValuesAffectingContentObject
@@ -356,7 +364,9 @@
 var CPObjectControllerContentKey                        = @"CPObjectControllerContentKey",
     CPObjectControllerObjectClassNameKey                = @"CPObjectControllerObjectClassNameKey",
     CPObjectControllerIsEditableKey                     = @"CPObjectControllerIsEditableKey",
-    CPObjectControllerAutomaticallyPreparesContentKey   = @"CPObjectControllerAutomaticallyPreparesContentKey";
+    CPObjectControllerAutomaticallyPreparesContentKey   = @"CPObjectControllerAutomaticallyPreparesContentKey",
+	CPObjectControllerManagedProxyKey					= @"CPObjectCOntrollerManagedProxyKey",
+	CPObjectControllerUsingManagedProxyKey				= @"CPObjectControllerUsingManagedProxyKey";
 
 @implementation CPObjectController (CPCoding)
 
@@ -368,11 +378,19 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
     {
         var objectClassName = [aCoder decodeObjectForKey:CPObjectControllerObjectClassNameKey],
             objectClass = CPClassFromString(objectClassName);
+		
+		_isUsingManagedProxy = [aCoder decodeBoolForKey:CPObjectControllerUsingManagedProxyKey];
+		if(_isUsingManagedProxy)[self setManagedProxy: [aCoder decodeObjectForKey:CPObjectControllerManagedProxyKey]];
 
         [self setObjectClass:objectClass || [CPMutableDictionary class]];
         [self setEditable:[aCoder decodeBoolForKey:CPObjectControllerIsEditableKey]];
         [self setAutomaticallyPreparesContent:[aCoder decodeBoolForKey:CPObjectControllerAutomaticallyPreparesContentKey] || NO];
-        [self setContent:[aCoder decodeObjectForKey:CPObjectControllerContentKey]];
+        if(_isUsingManagedProxy){
+			[_managedProxy setManagedObjectContext:[self managedObjectContext]];
+	 		[self setContent:[self _managedProxy];
+		} else {
+			[self setContent:[aCoder decodeObjectForKey:CPObjectControllerContentKey]];
+		}
 
         _observedKeys = [[CPCountedSet alloc] init];
     }
@@ -388,7 +406,12 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
         [aCoder encodeObject:CPStringFromClass(_objectClass) forKey:CPObjectControllerObjectClassNameKey];
     else if (_objectClassName)
         [aCoder encodeObject:_objectClassName forKey:CPObjectControllerObjectClassNameKey];
-
+		
+	if(_isUsingManagedProxy){
+		[aCoder encodeBool: _isUsingManagedProxy forKey:CPObjectControllerUsingManagedProxyKey];
+		[aCoder encodeObject:[self managedProxy] forKey:CPObjectControllerManagedProxyKey];
+	}
+	
     [aCoder encodeBool:[self isEditable] forKey:CPObjectControllerIsEditableKey];
     [aCoder encodeBool:[self automaticallyPreparesContent] forKey:CPObjectControllerAutomaticallyPreparesContentKey];
 }

@@ -60,6 +60,7 @@
 @import "CPImageView.j"
 @import "CPKeyBinding.j"
 @import "CPLevelIndicator.j"
+@import "_CPManagedProxy.j"
 @import "CPMenu.j"
 @import "CPMenuItem.j"
 @import "CPOpenPanel.j"
