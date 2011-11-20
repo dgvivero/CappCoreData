@@ -8,7 +8,7 @@ var FILE = require("file"),
     jake = require("jake"),
     stream = require("narwhal/term").stream;
 
-var subprojects = ["Objective-J", "CommonJS", "Foundation", "AppKit", "Tools"];
+var subprojects = ["Objective-J", "CommonJS", "Foundation","CoreData", "AppKit", "Tools"];
 
 ["build", "clean", "clobber"].forEach(function(aTaskName)
 {
