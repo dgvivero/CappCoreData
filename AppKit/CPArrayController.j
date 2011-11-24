@@ -1144,6 +1144,7 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
             [self prepareContent];
         else if (![self content])
             [self _setContentArray:[]];
+
     }
 
     return self;
@@ -1164,7 +1165,14 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
 
 - (void)awakeFromCib
 {
-    [self _selectionWillChange];
+    if (_isUsingManagedProxy && [self automaticallyPreparesContent]){
+			[_managedProxy setManagedObjectContext:[self managedObjectContext]];
+		
+	 		[self fetchWithRequest:[self defaultFetchRequest] merge:NO error:nil];
+		}
+		
+		CPLog.info("ArrayController EntityName:"+[self entityName]);
+	[self _selectionWillChange];
     [self _selectionDidChange];
 }
 

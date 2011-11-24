@@ -34,13 +34,14 @@
         _declaredKeys = [aCoder decodeObjectForKey:@"NSDeclaredKeys"];
 
         var className = [aCoder decodeObjectForKey:@"NSObjectClassName"];
-		var _isUsingManagedProxy = [aCoder decodeBoolForKey:@"_NSIsUsingManagedProxy"];
+		_isUsingManagedProxy = [aCoder decodeBoolForKey:@"_NSIsUsingManagedProxy"];
         
 		if (className)
             _objectClassName = CP_NSMapClassName(className);
         else if (_isUsingManagedProxy)
 			{
 				_managedProxy = [aCoder decodeObjectForKey:@"_NSManagedProxy"];
+				_entityName = [aCoder decodeObjectForKey:@"NSEntityName"];
 				_objectClass = [CPManagedObject class];
 			}
 		else

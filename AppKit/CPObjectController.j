@@ -22,7 +22,7 @@
 
 @import <Foundation/CPDictionary.j>
 @import <Foundation/CPCountedSet.j>
-@import <CoreData/CPManagedObjectContext.j>
+@import <CoreData/CoreData.j>
 
 @import "CPController.j"
 
@@ -49,7 +49,7 @@
 
     CPCountedSet    _observedKeys;
 
-	BOOL			_isUsingManagedProxy;
+	BOOL			_isUsingManagedProxy @accessors(property=isUsingManagedProxy);
 	_CPManagedProxy _managedProxy @accessors(property=managedProxy);
 	CPManagedObjectContext _managedContext @accessors(property=managedObjectContext);
 	CPPredicate     _fetchPredicate @accessors(property=fetchPredicate);
@@ -358,6 +358,24 @@
    [_observedKeys removeObject:aKeyPath];
    [super removeObserver:anObserver forKeyPath:aKeyPath];
 }
+//CoreData Support
+- (void)fetch:(id)sender
+{
+	[self fetchWithRequest:[self defaultFetchRequest] merge:NO error:nil];
+}
+- (CPFetchRequest)defaultFetchRequest
+{
+	var anEntity = [CPEntityDescription entityForName: _entityName inManagedObjectContext: _managedContext];
+	return [[CPFetchRequest alloc] initWithEntity:anEntity	predicate:_fetchPredicate];
+}
+
+
+- (BOOL)fetchWithRequest:(CPFetchRequest)fetchRequest merge:(BOOL)merge error:(CPError)error
+{	
+	var anArray = [_managedContext executeFetchRequest: fetchRequest];
+	[self setValue:anArray forKey:"contentArray"];
+	return YES
+}
 
 @end
 
@@ -380,14 +398,18 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
             objectClass = CPClassFromString(objectClassName);
 		
 		_isUsingManagedProxy = [aCoder decodeBoolForKey:CPObjectControllerUsingManagedProxyKey];
-		if(_isUsingManagedProxy)[self setManagedProxy: [aCoder decodeObjectForKey:CPObjectControllerManagedProxyKey]];
+		
 
         [self setObjectClass:objectClass || [CPMutableDictionary class]];
         [self setEditable:[aCoder decodeBoolForKey:CPObjectControllerIsEditableKey]];
         [self setAutomaticallyPreparesContent:[aCoder decodeBoolForKey:CPObjectControllerAutomaticallyPreparesContentKey] || NO];
-        if(_isUsingManagedProxy){
-			[_managedProxy setManagedObjectContext:[self managedObjectContext]];
-	 		[self setContent:[self _managedProxy];
+        
+		if(_isUsingManagedProxy){
+			CPLog.info("ObjectController _isUsingManagedProxy is true");
+			_managedProxy = [aCoder decodeObjectForKey:CPObjectControllerManagedProxyKey];
+			[self setEntityName: [_managedProxy entityName]];
+			[self setFetchPredicate:[_managedProxy fetchPredicate]];
+			
 		} else {
 			[self setContent:[aCoder decodeObjectForKey:CPObjectControllerContentKey]];
 		}
@@ -409,7 +431,7 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
 		
 	if(_isUsingManagedProxy){
 		[aCoder encodeBool: _isUsingManagedProxy forKey:CPObjectControllerUsingManagedProxyKey];
-		[aCoder encodeObject:[self managedProxy] forKey:CPObjectControllerManagedProxyKey];
+		[aCoder encodeObject: _managedProxy forKey:CPObjectControllerManagedProxyKey];
 	}
 	
     [aCoder encodeBool:[self isEditable] forKey:CPObjectControllerIsEditableKey];
@@ -420,6 +442,8 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
 {
     if (![self content] && [self automaticallyPreparesContent])
         [self prepareContent];
+	
+	
 }
 
 @end

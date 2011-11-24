@@ -76,7 +76,7 @@ var frameworkTask = framework (productName, function(frameworkTask)
     frameworkTask.setAuthor("Your Company");
     frameworkTask.setEmail("feedback @nospam@ yourcompany.com");
     frameworkTask.setSummary("CoreData");
-    frameworkTask.setSources(new FileList("*.j"));
+    frameworkTask.setSources(new FileList("**/*.j"));
     frameworkTask.setResources(new FileList("Resources/**/*"));
     frameworkTask.setFlattensSources(true);
     frameworkTask.setInfoPlistPath("Info.plist");

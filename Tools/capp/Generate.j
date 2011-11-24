@@ -127,7 +127,7 @@ function gen(/*va_args*/)
         frameworks = options.frameworks;
 
     if (!options.noFrameworks)
-        frameworks.push("Objective-J", "Foundation", "AppKit");
+        frameworks.push("Objective-J", "Foundation","CoreData", "AppKit");
 
     if (options.justFrameworks)
         createFrameworksInFile(frameworks, destinationProject, options.symlink, options.useCappBuild, options.force);

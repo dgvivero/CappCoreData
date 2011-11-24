@@ -1,4 +1,3 @@
-//Categories
 @import "CPManagedObjectModel+EOModel.j"
 @import "CPManagedObjectModel+XCDataModel.j"
 
@@ -7,4 +6,3 @@
 @import "CPSet+CPCoreDataSerialization.j"
 @import "CPDictionary+CPCoreDataSerialization.j"
 @import "CPArray+CPCoreDataSerialization.j"
-///@import "CPObjectControllerCoreDataSupport.j"
