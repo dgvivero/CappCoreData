@@ -44,8 +44,9 @@
 				_entityName = [aCoder decodeObjectForKey:@"NSEntityName"];
 				_objectClass = [CPManagedObject class];
 			}
-		else
-            _objectClass = [CPMutableDictionary class];
+         else   _objectClass = [CPMutableDictionary class];
+
+		
 
         _isEditable = [aCoder decodeBoolForKey:@"NSEditable"];
         _automaticallyPreparesContent = [aCoder decodeBoolForKey:@"NSAutomaticallyPreparesContent"];

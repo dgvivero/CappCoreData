@@ -359,7 +359,7 @@
    [super removeObserver:anObserver forKeyPath:aKeyPath];
 }
 //CoreData Support
-- (void)fetch:(id)sender
+/*- (void)fetch:(id)sender
 {
 	[self fetchWithRequest:[self defaultFetchRequest] merge:NO error:nil];
 }
@@ -373,9 +373,8 @@
 - (BOOL)fetchWithRequest:(CPFetchRequest)fetchRequest merge:(BOOL)merge error:(CPError)error
 {	
 	var anArray = [_managedContext executeFetchRequest: fetchRequest];
-	[self setValue:anArray forKey:"contentArray"];
 	return YES
-}
+}*/
 
 @end
 
@@ -410,9 +409,11 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
 			[self setEntityName: [_managedProxy entityName]];
 			[self setFetchPredicate:[_managedProxy fetchPredicate]];
 			
-		} else {
-			[self setContent:[aCoder decodeObjectForKey:CPObjectControllerContentKey]];
-		}
+			
+		} 
+		
+		[self setContent:[aCoder decodeObjectForKey:CPObjectControllerContentKey]];
+		
 
         _observedKeys = [[CPCountedSet alloc] init];
     }

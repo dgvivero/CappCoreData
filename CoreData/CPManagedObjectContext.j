@@ -113,12 +113,14 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 // @TODO update methods to use _executeStoreFetchRequest
 - (CPManagedObject) updateObject:(CPManagedObject) aObject mergeChanges:(BOOL) mergeChanges
 {
+	CPLog.info("Ojo no esta implementado ->  updateObject:(CPManagedObject) aObject mergeChanges:(BOOL) mergeChanges")
 	return nil;
 }
 
 // @TODO update methods to use _executeStoreFetchRequest
 - (CPManagedObject) updateObjectWithID:(CPManagedObjectID) aObjectID mergeChanges:(BOOL) mergeChanges
 {
+		CPLog.info("Ojo no esta implementado ->  updateObjectWithID:(CPManagedObjectID) aObjectID mergeChanges:(BOOL) mergeChanges")
 	return nil;
 }
 
@@ -303,6 +305,7 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 						[[registeredObject objectID] setIsTemporary: [[objectFromResponse objectID] isTemporary]];
 					}
 				}
+				return YES;
 			}
 			if(error == nil)
 				result = [self reset];
@@ -521,7 +524,7 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 /*
  *	Insert and delete registered objects
  */
-- (void) insertObject: ({CPManagedObject}) aObject
+- (void) insertObject: (CPManagedObject) aObject
 {		
 	if([aObject objectID] == nil)
 	{

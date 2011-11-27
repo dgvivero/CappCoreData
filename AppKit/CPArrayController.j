@@ -144,7 +144,9 @@
 
 - (void)prepareContent
 {
-    [self _setContentArray:[[self newObject]]];
+    
+	 [self _setContentArray:[[self newObject]]];
+	
 }
 /*!
     Returns YES if the selection should try to be preserved when the content changes, otherwise NO.
@@ -1045,6 +1047,7 @@
     return [self isEditable];
 }
 
+
 @end
 
 @implementation CPArrayController (CPBinder)
@@ -1165,13 +1168,8 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
 
 - (void)awakeFromCib
 {
-    if (_isUsingManagedProxy && [self automaticallyPreparesContent]){
-			[_managedProxy setManagedObjectContext:[self managedObjectContext]];
-		
-	 		[self fetchWithRequest:[self defaultFetchRequest] merge:NO error:nil];
-		}
-		
-		CPLog.info("ArrayController EntityName:"+[self entityName]);
+  
+	CPLog.info("ArrayController EntityName:"+[self entityName]);
 	[self _selectionWillChange];
     [self _selectionDidChange];
 }
