@@ -359,7 +359,7 @@
    [super removeObserver:anObserver forKeyPath:aKeyPath];
 }
 //CoreData Support
-/*- (void)fetch:(id)sender
+- (void)fetch:(id)sender
 {
 	[self fetchWithRequest:[self defaultFetchRequest] merge:NO error:nil];
 }
@@ -374,7 +374,7 @@
 {	
 	var anArray = [_managedContext executeFetchRequest: fetchRequest];
 	return YES
-}*/
+}
 
 @end
 
@@ -441,7 +441,12 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
 
 - (void)awakeFromCib
 {
-    if (![self content] && [self automaticallyPreparesContent])
+    /*_entity = [CPEntityDescription entityForName:_entityName 
+				   inManagedObjectContext: _managedContext];
+				
+	_declaredKeys = [_entity propertyNames];*/
+
+	if (![self content] && [self automaticallyPreparesContent])
         [self prepareContent];
 	
 	

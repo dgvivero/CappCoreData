@@ -1170,6 +1170,7 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
 {
   
 	CPLog.info("ArrayController EntityName:"+[self entityName]);
+	//[self _setContentArray:[self fetch:nil]];
 	[self _selectionWillChange];
     [self _selectionDidChange];
 }
