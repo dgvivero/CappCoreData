@@ -768,10 +768,6 @@ NOT YET IMPLEMENTED
 */
 - (void)setSelectionHighlightStyle:(unsigned)aSelectionHighlightStyle
 {
-    //early return for IE.
-    if (aSelectionHighlightStyle == CPTableViewSelectionHighlightStyleSourceList && !CPFeatureIsCompatible(CPHTMLCanvasFeature))
-        return;
-
     _selectionHighlightStyle = aSelectionHighlightStyle;
     [self setNeedsDisplay:YES];
 
@@ -1795,7 +1791,7 @@ NOT YET IMPLEMENTED
 {
     if (_implementedDelegateMethods & CPTableViewDelegate_tableView_heightOfRow_)
     {
-            return idx = [_cachedRowHeights indexOfObject:aPoint
+            return [_cachedRowHeights indexOfObject:aPoint
                                             inSortedRange:nil
                                                   options:0
                                           usingComparator:function(aPoint, rowCache)
@@ -3690,7 +3686,7 @@ Your delegate can implement this method to avoid subclassing the tableview to ad
     if (!count)
         return;
 
-    var drawGradient = (_selectionHighlightStyle === CPTableViewSelectionHighlightStyleSourceList && [_selectedRowIndexes count] >= 1),
+    var drawGradient = (CPFeatureIsCompatible(CPHTMLCanvasFeature) && _selectionHighlightStyle === CPTableViewSelectionHighlightStyleSourceList && [_selectedRowIndexes count] >= 1),
         deltaHeight = 0.5 * (_gridStyleMask & CPTableViewSolidHorizontalGridLineMask);
 
     CGContextBeginPath(context);
@@ -3817,7 +3813,7 @@ Your delegate can implement this method to avoid subclassing the tableview to ad
 */
 - (void)_drawGroupRowsForRects:(CPArray)rects
 {
-    if (_selectionHighlightStyle === CPTableViewSelectionHighlightStyleSourceList || !rects.length)
+    if ((CPFeatureIsCompatible(CPHTMLCanvasFeature) && _selectionHighlightStyle === CPTableViewSelectionHighlightStyleSourceList) || !rects.length)
         return;
 
     var context = [[CPGraphicsContext currentContext] graphicsPort],
