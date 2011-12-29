@@ -71,7 +71,7 @@
 + (CPSet)keyPathsForValuesAffectingArrangedObjects
 {
     // Also depends on "filterPredicate" but we'll handle that manually.
-    return [CPSet setWithObjects:"content", "sortDescriptors"];
+    return [CPSet setWithObjects:"content", "sortDescriptors", "filterPredicate"];
 }
 
 + (CPSet)keyPathsForValuesAffectingSelection
