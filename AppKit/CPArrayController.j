@@ -344,7 +344,8 @@
 */
 - (void)_setContentSet:(id)aSet
 {
-    [self setContent:[aSet allObjects]];
+    if ([aSet isKindOfClass:[CPSet class]])
+		[self setContent:[aSet allObjects]];
 }
 
 /*!
@@ -1139,6 +1140,7 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
         _alwaysUsesMultipleValuesMarker = [aCoder decodeBoolForKey:CPArrayControllerAlwaysUsesMultipleValuesMarker];
         _automaticallyRearrangesObjects = [aCoder decodeBoolForKey:CPArrayControllerAutomaticallyRearrangesObjects];
         _sortDescriptors = [CPArray array];
+		
 
         if (![self content] && [self automaticallyPreparesContent])
             [self prepareContent];
@@ -1165,6 +1167,10 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
 - (void)awakeFromCib
 {
     [self _selectionWillChange];
+	if (_isUsingManagedProxy){
+		[[self managedProxy] setValue:[self managedObjectContext] forKey:@"managedObjectContext"];
+		[self bind:@"contentArray" toObject:[self managedProxy] withKeyPath:@"itemsArray" options:nil];
+	}
     [self _selectionDidChange];
 }
 

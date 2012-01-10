@@ -20,7 +20,7 @@ CPLogRegister(CPLogConsole);
     @outlet CPTextField         selectedNameField;
     @outlet CPTextField         selectedPriceField;
 
-    CPArray             itemsArray;
+    CPMutableArray             itemsArray;
     CPArrayController   arrayController;
 }
 
@@ -30,7 +30,7 @@ CPLogRegister(CPLogConsole);
 
     //create our non ui objects
 
-    var notWrongItem = [Item new];
+    var notWrongItem = [[Item alloc] init];
     [notWrongItem setRightOrWrong:"also right"];
     itemsArray = [[Item new], notWrongItem];
 
