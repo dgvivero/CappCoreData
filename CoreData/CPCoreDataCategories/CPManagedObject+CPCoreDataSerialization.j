@@ -195,7 +195,7 @@ couchREV="couchREV";
 	while((aKey = [propertyKeys nextObject]))		
 	{		
 		var aObject = [aDictionary objectForKey:aKey];
-		if(aObject != nil)
+		if(aObject != nil) 
 		{			
 			if([self isPropertyOfTypeAttribute:aKey])
 			{
@@ -203,7 +203,7 @@ couchREV="couchREV";
 				
 				if(aClass.name == "CPDate")
 				{								
-					[result setObject:[CPDate dateWithTimeIntervalSince1970:aObject] forKey:aKey];
+					[result setObject:new Date(aObject) forKey:aKey];
 				}
 				else
 				{
@@ -212,11 +212,11 @@ couchREV="couchREV";
 			}
 			else
 			{
+				
 				if([self isPropertyOfTypeToManyRelationship:aKey])
 				{					
 					var toManySet = [[CPMutableSet alloc] init];
 					var aObjectIDDictionary;
-					
 					for(var j = 0; j < [aObject count]; j++)
 					//@TODO_ENUM while((aObjectIDDictionary = [aObjectEnum nextObject]))
 					{				
@@ -301,7 +301,8 @@ couchREV="couchREV";
 			{
 				if([aObject isKindOfClass:[CPDate class]])
 				{
-					[result setObject:(aObject.getTime() / 1000.0) forKey:aKey];
+					
+					[result setObject:aObject.getTime() forKey:aKey]; 
 				}
 				else if([aObject isKindOfClass:[CPNumber class]])
 				{

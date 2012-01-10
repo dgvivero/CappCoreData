@@ -113,7 +113,9 @@ CPDTransformableAttributeType = 1200;
 	result = result + "\n";
 	result = result + "name:" + [self name] + ";";
 	result = result + "\n";
-	result = result + "type:" + [self typeValue] + ";";
+	result = result + "type:" + [self typeName] + ";";
+	result = result + "\n";
+	result = result + "ClassName:" + [self classValueName] + ";";
 	result = result + "\n";
 	result = result + "optional:" + [self isOptional] + ";";
 

@@ -36,6 +36,6 @@
 @import "CPFetchedPropertyDescription.j"
 @import "CPFetchRequest.j"
 @import "CPFetchRequestTemplates.j"
-
+//@import "_CPManagedProxy.j"
 @import "CPCoreDataCategories.j"
 @import "NSCoreData.j"

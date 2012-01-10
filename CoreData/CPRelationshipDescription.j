@@ -17,8 +17,8 @@ CPRelationshipDescriptionDeleteRuleNoAction = 3;
 
 @implementation CPRelationshipDescription : CPPropertyDescription
 {
-	CPDString _inversePropertyName @accessors(property=inversePropertyName);
-	CPDString _destinationEntityName @accessors(property=destinationEntityName);
+	CPString _inversePropertyName @accessors(property=inversePropertyName);
+	CPString _destinationEntityName @accessors(property=destinationEntityName);
 	BOOL _toMany @accessors(property=isToMany);
 	int _deleteRule @accessors(property=deleteRule);
 }

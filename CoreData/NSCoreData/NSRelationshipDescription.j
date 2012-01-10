@@ -28,8 +28,8 @@
 		[self setInversePropertyName:[aCoder decodeObjectForKey: @"_NSInverseRelationshipName"]];
 		[self setName:[aCoder decodeObjectForKey: @"NSPropertyName"]];
 		[self setIsOptional:[aCoder decodeBoolForKey: @"NSIsOptional"]];
-		[self setIsToMany:[self NS_isToMany:[aCoder decodeIntForKey: @"NSMaxCount"]]];
-		[self setDeleteRule:[self NS_deleteRule:[aCoder decodeIntForKey: @"NSDeleteRule"]]];
+		[self setIsToMany:[self NS_isToMany:[aCoder decodeObjectForKey: @"NSMaxCount"]]];
+		[self setDeleteRule:[self NS_deleteRule:[aCoder decodeObjectForKey: @"NSDeleteRule"]]];
 	}
 	
 	return self;
@@ -37,14 +37,11 @@
 
 - (BOOL)NS_isToMany:(int)count
 {    
-	if(count > 1)
-	{
-		return YES;
-	}
-    else
-	{
-		return NO;
-	}
+	if(count == 1)
+			return NO;
+	else
+			return YES;
+	
 }
 
 - (int) NS_deleteRule:(int) aDeleteRule

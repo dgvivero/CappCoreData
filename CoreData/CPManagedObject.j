@@ -137,7 +137,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 				CPLog.fatal("isKindOfClass Array **fail**");
 				values = [CPMutableSet setWithArray: value];
 			}
-		}
+		} 
 		
 		if(values != nil)
 		{
@@ -232,6 +232,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 	if([self _containsKey:aKey])
 	{
 		[self takeStoredValue:aValue forKey:aKey];
+
 	}
 	else
 	{
@@ -336,21 +337,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 			else
 			{
 				[propertyObject addObject: tmpObjectID];	
-			}
-			
-			// if([propertyObject containsObject:tmpObjectID])
-			// 	return;
-			// 	
-			// [propertyObject addObject: tmpObjectID];
-			// 
-			// var changedPropertySet = nil;
-			// if(![_changedData objectForKey:propertyName])
-			// 	changedPropertySet = [_changedData objectForKey:propertyName];
-			// else
-			// 	changedPropertySet = [[CPMutableSet alloc] init];
-			// 
-			// [changedPropertySet addObject:tmpObjectID];
-			// [_changedData setObject:changedPropertySet forKey:propertyName];			
+			}		
 			
 			[self _setChangedObject:propertyObject forKey:propertyName];
 			
@@ -362,20 +349,17 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 			
 			propertyObject = tmpObjectID;
 			
-//			[_changedData setObject:propertyObject forKey:propertyName];
 			[self _setChangedObject:propertyObject forKey:propertyName];
 		}
 
 		CPLog.debug(@"addObject:toBothSideOfRelationship: " + [localRelationship name]);
 
-//		[_data setObject:propertyObject forKey:propertyName];
-//		[_changedData setObject:propertyObject forKey:propertyName];
 		
 		//Add otherside
 		var localRelationshipDestinationName  = [localRelationship destinationEntityName];
-		var foreignRelationship = [self realtionshipWithDestination:[localRelationship destination]];
+		var foreignRelationship = [self relationshipWithDestination:[localRelationship destination]];
 		
-//		CPLog.info([[self objectID] stringRepresentation]);
+
 		var myObjectID = [[_context objectRegisteredForID:[self objectID]] objectID];
 
 		
@@ -404,18 +388,94 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 
 - (void)removeObjects:(CPArray)objectArray fromBothSideOfRelationship:(CPString)propertyName
 {
-	//TODO implement
+	if(objectArray != nil && [objectArray count] > 0)
+	{
+		var i = 0;
+		
+		for(i=0;i<[objectArray count];i++)
+		{
+			var object = [objectArray objectAtIndex:i];
+			
+			[self removeObject:object fromBothSideOfRelationship:propertyName];
+		}		
+	}
 }
 
 - (void)removeObject:(id)object fromBothSideOfRelationship:(CPString)propertyName
 {
-	//TODO implement
+		var tmpObjectID;
+
+		if([object isKindOfClass: [CPManagedObject class]])
+		{
+			tmpObjectID = [object objectID];
+		}
+		else if([object isKindOfClass: [CPManagedObjectID class]])
+		{
+			tmpObjectID = object;
+		}
+
+		if(tmpObjectID != nil && [self isPropertyOfTypeRelationship: propertyName])
+		{		
+
+			[self willChangeValueForKey:propertyName];
+
+			//Add local
+			var localRelationship = [[_entity relationshipsByName] objectForKey: propertyName];
+			var propertyObject = [_data objectForKey:propertyName];
+
+			if([localRelationship isToMany])
+			{
+
+				[propertyObject removeObject: tmpObjectID];	
+
+				[self _setChangedObject:propertyObject forKey:propertyName];
+
+			}
+			else
+			{
+				if(propertyObject == tmpObjectID) return;
+
+				propertyObject = tmpObjectID;
+
+				[self _setChangedObject:propertyObject forKey:propertyName];
+			}
+
+			CPLog.debug(@"removeObject:fromBothSideOfRelationship: " + [localRelationship name]);
+
+			//Add otherside
+			var localRelationshipDestinationName  = [localRelationship destinationEntityName];
+			var foreignRelationship = [self relationshipWithDestination:[localRelationship destination]];
+
+	//		CPLog.info([[self objectID] stringRepresentation]);
+			var myObjectID = [[_context objectRegisteredForID:[self objectID]] objectID];
+
+
+			if(myObjectID != nil)
+			{
+				if(![foreignRelationship isToMany])
+				{
+					[[_context objectRegisteredForID:tmpObjectID] removeObject:myObjectID fromBothSideOfRelationship:[foreignRelationship name]];
+				}
+				else
+				{
+					[[_context objectRegisteredForID:tmpObjectID] removeObject:myObjectID fromBothSideOfRelationship:[foreignRelationship name]];
+				}
+			}
+
+			//Take care that the new object is under control
+			if([_context objectRegisteredForID:tmpObjectID] == nil)
+			{
+				[_context deleteObject:tmpObjectID];
+			}			
+
+			[self didChangeValueForKey:propertyName];
+		}
 }
 
 - (CPArray)toManyRelationshipsKey
 {
 	var result = [[CPMutableArray alloc] init];
-	var relationshipDict = [entity relationshipsByName];
+	var relationshipDict = [_entity relationshipsByName];
 	var allKeys = [relationshipDict allKeys];
 	var i = 0;
 	
@@ -424,7 +484,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 		var key = [allKeys objectAtIndex:i];
 		var tmpRel = [relationshipDict objectForKey: key];
 		
-		if([[tmpRel destination] isToMany] == YES)
+		if([tmpRel isToMany] == YES)
 		{
 			[result addObject:tmpRel];
 		}
@@ -874,10 +934,9 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 {
 	if([[_entity relationshipsByName] objectForKey:aKey] != nil)
 	{
-		if(![[[_entity relationshipsByName] objectForKey:aKey] isToMany])
-		{
-			return YES;
-		}
+		
+		return ![[[_entity relationshipsByName] objectForKey:aKey] isToMany];
+	
 	}
 	
 	return NO;
@@ -911,7 +970,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 }
 
 
-- (CPRelationshipDescription)realtionshipWithDestination:(CPEntityDescription)aEntity
+- (CPRelationshipDescription)relationshipWithDestination:(CPEntityDescription)aEntity
 {
 	var relationshipDict = [aEntity relationshipsByName];
 	var allKeys = [relationshipDict allKeys];

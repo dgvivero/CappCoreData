@@ -113,7 +113,8 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 // @TODO update methods to use _executeStoreFetchRequest
 - (CPManagedObject) updateObject:(CPManagedObject) aObject mergeChanges:(BOOL) mergeChanges
 {
-	CPLog.info("Ojo no esta implementado ->  updateObject:(CPManagedObject) aObject mergeChanges:(BOOL) mergeChanges")
+	CPLog.info("Ojo no esta implementado ->  updateObject:(CPManagedObject) aObject mergeChanges:(BOOL) mergeChanges");
+	CPLog.info("objecto:"+[aObject stringRepresentation]+"* merge"+mergeChanges);
 	return nil;
 }
 
@@ -121,7 +122,12 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 - (CPManagedObject) updateObjectWithID:(CPManagedObjectID) aObjectID mergeChanges:(BOOL) mergeChanges
 {
 		CPLog.info("Ojo no esta implementado ->  updateObjectWithID:(CPManagedObjectID) aObjectID mergeChanges:(BOOL) mergeChanges")
-	return nil;
+		//CPLog.info([aObjectID stringRepresentation]);
+		//CPLog.info("objetoReregistrado: "+[[self _fetchObjectWithID:aObjectID] stringRepresentation]);
+		//CPLog.info("objetos Registrados: "+ _registeredObjects);
+	//return nil;
+//return [self objectRegisteredForID:aObjectID];
+	return [self _fetchObjectWithID:aObjectID];
 }
 
 // @TODO fetchLimit is missing
@@ -180,20 +186,27 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 - (CPSet) _executeStoreFetchRequest:(CPFetchRequest) aFetchRequest
 {
 	var error;
+	var resultArray = [[CPMutableArray alloc] init];
 	
 	if([[self store] respondsToSelector:@selector(executeFetchRequest:inManagedObjectContext:error:)])
 	{
+		
 		var resultSet = [[self store] executeFetchRequest:aFetchRequest
 								  inManagedObjectContext:self
 												   error:error];
 
 		if(resultSet != nil && [resultSet count] > 0 && error == nil)
 		{
-			return resultSet;
+			var objectEnum = [resultSet objectEnumerator];
+			var objectFromResponse;
+			while((objectFromResponse = [objectEnum nextObject]))
+			{
+				[resultArray addObject:[self _registerObject:objectFromResponse]];
+			}
 		}
 	}
 	
-	return [CPSet setWithArray:[]];
+	return [CPSet setWithArray:resultArray];
 }
 
 
@@ -264,7 +277,7 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 	
 	[self hasChanges];
 	[[CPNotificationCenter defaultCenter] postNotificationName:CPManagedObjectContextDidLoadObjectsNotification 
-														object: self 
+														object: [resultSet allObjects] 
 													  userInfo: nil];
 	return result;
 }
@@ -332,7 +345,7 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 }
 
 
-- (void) _validateUpdatedObject:({CPSet}) updated insertedObjects:({CPSet}) inserted
+- (void) _validateUpdatedObject:(CPSet) updated insertedObjects:(CPSet) inserted
 {
 	var unionSet = [[CPMutableSet alloc] init];
 	[unionSet unionSet:updated];
@@ -409,12 +422,13 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 - (CPManagedObject) _fetchObjectWithID:(CPManagedObjectID) aObjectID
 {	
 	var objectFromResponse = nil;
+	CPLog.info("_fetchObjectWithID validateGlobal:"+[self _deletedObjectWithID:aObjectID]);
 	if(aObjectID != nil)
 	{
 		if([self _deletedObjectWithID:aObjectID] == nil && [aObjectID validatedGlobalID])
 		{
-			var setWithObjIDs = [[CPMutableSet alloc] init];
-			[setWithObjIDs addObject:aObjectID];
+			//var setWithObjIDs = [[CPMutableSet alloc] init];
+			//[setWithObjIDs addObject:aObjectID];
 
 			var newPropertiesDict = [[CPMutableDictionary alloc] init];
 			var localEntity = [[self model] entityWithName:[[aObjectID entity] name]];
@@ -423,20 +437,16 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 
 		
 			var error = nil;
-			var resultSet = [[self store] fetchObjectsWithID:setWithObjIDs fetchProperties:newPropertiesDict error:error];
-			if(resultSet != nil && [resultSet count] > 0 && error == nil)
-			{
-				var objectEnum = [resultSet objectEnumerator];
-				var objectFromResponse;
-			
-				while((objectFromResponse = [objectEnum nextObject]))
-				{
-					[[objectFromResponse objectID] setLocalID: [aObjectID localID]];
-					objectFromResponse = [self _registerObject:objectFromResponse];
-					aObjectID = [objectFromResponse objectID];
-//					CPLog.trace("_fetchObjectWithID: " + [[objectFromResponse objectID] localID]);
-					return objectFromResponse;
-				}
+			objectFromResponse = [[self store] fetchObjectWithID:aObjectID fetchProperties:newPropertiesDict inManagedObjectContext:self error:error];
+			CPLog("Fetch-:"+[objectFromResponse stringRepresentation]);
+			if(objectFromResponse != nil && error == nil)
+			{	[[objectFromResponse objectID] setLocalID: [aObjectID localID]];
+				objectFromResponse = [self _registerObject:objectFromResponse];
+				aObjectID = [objectFromResponse objectID];
+				CPLog.trace("_fetchObjectWithID: " + [[objectFromResponse objectID] localID]);
+				CPLog.info("fethced from CPManagedObjectContext :"+[aObjectID stringRepresentation]);
+				return objectFromResponse;
+				
 			}
 		}
 	}
@@ -558,13 +568,13 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 }
 
 
-- (void) deleteObject: ({CPManagedObject}) aObject
+- (void) deleteObject: (CPManagedObject) aObject
 {
 	[self _deleteObject:aObject saveAfterDeletion:YES];
 }
 
 
-- (void) _deleteObject: ({CPManagedObject}) aObject saveAfterDeletion:(BOOL) saveAfterDeletion
+- (void) _deleteObject: (CPManagedObject) aObject saveAfterDeletion:(BOOL) saveAfterDeletion
 {
 	if ([self objectRegisteredForID: [aObject objectID]] != nil)
 	{		

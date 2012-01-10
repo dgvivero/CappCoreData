@@ -71,7 +71,7 @@
 + (CPSet)keyPathsForValuesAffectingArrangedObjects
 {
     // Also depends on "filterPredicate" but we'll handle that manually.
-    return [CPSet setWithObjects:"content", "sortDescriptors", "filterPredicate"];
+    return [CPSet setWithObjects:"content", "sortDescriptors"];
 }
 
 + (CPSet)keyPathsForValuesAffectingSelection
@@ -144,9 +144,7 @@
 
 - (void)prepareContent
 {
-    
-	 [self _setContentArray:[[self newObject]]];
-	
+    [self _setContentArray:[[self newObject]]];
 }
 /*!
     Returns YES if the selection should try to be preserved when the content changes, otherwise NO.
@@ -346,7 +344,8 @@
 */
 - (void)_setContentSet:(id)aSet
 {
-    [self setContent:[aSet allObjects]];
+    if ([aSet isKindOfClass:[CPSet class]])
+		[self setContent:[aSet allObjects]];
 }
 
 /*!
@@ -1047,7 +1046,6 @@
     return [self isEditable];
 }
 
-
 @end
 
 @implementation CPArrayController (CPBinder)
@@ -1142,12 +1140,12 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
         _alwaysUsesMultipleValuesMarker = [aCoder decodeBoolForKey:CPArrayControllerAlwaysUsesMultipleValuesMarker];
         _automaticallyRearrangesObjects = [aCoder decodeBoolForKey:CPArrayControllerAutomaticallyRearrangesObjects];
         _sortDescriptors = [CPArray array];
+		
 
         if (![self content] && [self automaticallyPreparesContent])
             [self prepareContent];
         else if (![self content])
             [self _setContentArray:[]];
-
     }
 
     return self;
@@ -1168,10 +1166,11 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
 
 - (void)awakeFromCib
 {
-  
-	CPLog.info("ArrayController EntityName:"+[self entityName]);
-	//[self _setContentArray:[self fetch:nil]];
-	[self _selectionWillChange];
+    [self _selectionWillChange];
+	if (_isUsingManagedProxy){
+		[[self managedProxy] setValue:[self managedObjectContext] forKey:@"managedObjectContext"];
+		[self bind:@"contentArray" toObject:[self managedProxy] withKeyPath:@"itemsArray" options:nil];
+	}
     [self _selectionDidChange];
 }
 
