@@ -212,7 +212,10 @@
 */
 - (id)_defaultNewObject
 {
-    return [[[self objectClass] alloc] init];
+    if (_managedContext)
+		return [_managedContext insertNewObjectForEntityForName:[_managedProxy entityName]];
+		else
+		return [[[self objectClass] alloc] init];
 }
 
 /*!
@@ -244,6 +247,10 @@
 {
     if ([self content] === anObject)
         [self setContent:nil];
+	
+	if (_managedContext)
+		[_managedContext deleteObject:anObject];
+	
 
     var binderClass = [[self class] _binderClassForBinding:@"contentObject"];
     [[binderClass getBinding:@"contentObject" forObject:self] reverseSetValueFor:@"contentObject"];
@@ -274,7 +281,7 @@
 - (void)remove:(id)aSender
 {
     // FIXME: This should happen on the next run loop?
-    [self removeObject:[self content]];
+	[self removeObject:[self content]];
 }
 
 /*!

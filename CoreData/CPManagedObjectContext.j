@@ -422,7 +422,7 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 - (CPManagedObject) _fetchObjectWithID:(CPManagedObjectID) aObjectID
 {	
 	var objectFromResponse = nil;
-	CPLog.info("_fetchObjectWithID validateGlobal:"+[self _deletedObjectWithID:aObjectID]);
+	CPLog.info("_fetchObjectWithID validateGlobal:");
 	if(aObjectID != nil)
 	{
 		if([self _deletedObjectWithID:aObjectID] == nil && [aObjectID validatedGlobalID])
@@ -438,13 +438,11 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 		
 			var error = nil;
 			objectFromResponse = [[self store] fetchObjectWithID:aObjectID fetchProperties:newPropertiesDict inManagedObjectContext:self error:error];
-			CPLog("Fetch-:"+[objectFromResponse stringRepresentation]);
+			//CPLog("Fetch-:"+[objectFromResponse stringRepresentation]);
 			if(objectFromResponse != nil && error == nil)
 			{	[[objectFromResponse objectID] setLocalID: [aObjectID localID]];
 				objectFromResponse = [self _registerObject:objectFromResponse];
 				aObjectID = [objectFromResponse objectID];
-				CPLog.trace("_fetchObjectWithID: " + [[objectFromResponse objectID] localID]);
-				CPLog.info("fethced from CPManagedObjectContext :"+[aObjectID stringRepresentation]);
 				return objectFromResponse;
 				
 			}

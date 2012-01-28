@@ -404,14 +404,19 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 - (void)removeObject:(id)object fromBothSideOfRelationship:(CPString)propertyName
 {
 		var tmpObjectID;
+		
 
-		if([object isKindOfClass: [CPManagedObject class]])
+		if([object isKindOfClass:[CPManagedObject class]])
 		{
+			CPLog("MO Class " + [object stringRepresentation])
 			tmpObjectID = [object objectID];
+		
 		}
-		else if([object isKindOfClass: [CPManagedObjectID class]])
+		else if([object isKindOfClass:[CPManagedObjectID class]])
 		{
+			CPLog("MOID Class")
 			tmpObjectID = object;
+			
 		}
 
 		if(tmpObjectID != nil && [self isPropertyOfTypeRelationship: propertyName])
@@ -433,11 +438,11 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 			}
 			else
 			{
-				if(propertyObject == tmpObjectID) return;
+				[_context deleteObject:tmpObjectID];
+				
+				//propertyObject = tmpObjectID;
 
-				propertyObject = tmpObjectID;
-
-				[self _setChangedObject:propertyObject forKey:propertyName];
+				//[self _setChangedObject:propertyObject forKey:propertyName];
 			}
 
 			CPLog.debug(@"removeObject:fromBothSideOfRelationship: " + [localRelationship name]);
@@ -445,25 +450,28 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 			//Add otherside
 			var localRelationshipDestinationName  = [localRelationship destinationEntityName];
 			var foreignRelationship = [self relationshipWithDestination:[localRelationship destination]];
+			CPLog("fores->"+[foreignRelationship name]);
+			CPLog("fores->"+localRelationshipDestinationName);
+			
 
-	//		CPLog.info([[self objectID] stringRepresentation]);
+			CPLog.info([[self objectID] stringRepresentation]);
 			var myObjectID = [[_context objectRegisteredForID:[self objectID]] objectID];
 
 
 			if(myObjectID != nil)
 			{
-				if(![foreignRelationship isToMany])
+				if([foreignRelationship isToMany])
 				{
 					[[_context objectRegisteredForID:tmpObjectID] removeObject:myObjectID fromBothSideOfRelationship:[foreignRelationship name]];
 				}
 				else
 				{
-					[[_context objectRegisteredForID:tmpObjectID] removeObject:myObjectID fromBothSideOfRelationship:[foreignRelationship name]];
+					[[_context objectRegisteredForID:tmpObjectID ] removeObject:myObjectID fromBothSideOfRelationship:[foreignRelationship name]];
 				}
 			}
 
 			//Take care that the new object is under control
-			if([_context objectRegisteredForID:tmpObjectID] == nil)
+			if([_context objectRegisteredForID:tmpObjectID] != nil)
 			{
 				[_context deleteObject:tmpObjectID];
 			}			
@@ -565,6 +573,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 		if([relationshipObject deleteRule] == CPRelationshipDescriptionDeleteRuleNullify)
 		{
 			CPLog.debug(@"The deletion rule for relationship '" + property + "' is CPRelationshipDescriptionDeleteRuleNullify.");
+			
 			if([self isPropertyOfTypeToManyRelationship:property])
 			{
 				if(valueForProperty != nil && [valueForProperty count] > 0)
@@ -574,6 +583,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 					while((objectFromValueForProperty = [valueForPropertyEnum nextObject]) != nil)
 					{
 						[objectFromValueForProperty _deleteReferencesForObject:self];
+						
 					}
 				}
 			}
@@ -582,6 +592,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 				if(valueForProperty != nil)
 				{
 					[valueForProperty _deleteReferencesForObject:self];
+				
 				}
 			}
 		}
@@ -656,9 +667,14 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 	var e = [[_entity relationshipsByName] keyEnumerator];
 	var property;
 	
+	CPLog("self" +  [self class]);
+	CPLog("Object" +  [aObject class]);
+	
+	
 	while ((property = [e nextObject]) != nil)
 	{
 		var valueForProperty = [self valueForKey:property];
+		[self willChangeValueForKey:property];
 		if(valueForProperty != nil)
 		{
 			if([self isPropertyOfTypeToManyRelationship:property])
@@ -667,12 +683,13 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 				var objectFromValueForProperty;
 				while((objectFromValueForProperty = [valueForPropertyEnum nextObject]) != nil)
 				{
-					if ([[objectFromValueForProperty objectID] isEqualToLocalID: [aObject objectID]] == YES)
+					if ([[objectFromValueForProperty objectID] isEqualToLocalID: [aObject objectID]])
 					{
+						
 						[valueForProperty removeObject:[objectFromValueForProperty objectID]];
 						
 						var changedPropertySet = nil;
-						if(![_data objectForKey:property])
+						if([_data objectForKey:property])
 							changedPropertySet = [_data objectForKey:property];
 	
 						if(changedPropertySet != nil || [changedPropertySet count] > 0)
@@ -683,17 +700,18 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 						}						
 					}
 				}
+				
 			}
 			else
 			{
 				if ([[valueForProperty objectID] isEqualToLocalID: [aObject objectID]] == YES)
 				{
 					[self _setChangedObject:nil forKey:property];
-					// [_data setObject:nil forKey:property];
-					// [_changedData setObject:nil forKey:property];
+					
 				}	
 			}
 		}
+		[self didChangeValueForKey:property];
 	}
 }
 
@@ -812,22 +830,6 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 	return result;
 }
 
-/*
-@deprecated
-- (void) _mergeChangedDataWithAllData
-{
-	var aEnum = [_data keyEnumerator];
-	var aKey;
-	while((aKey = [aEnum nextObject]))
-	{
-		var aObject = [_data objectForKey:aKey];
-		if([_changedData objectForKey:aKey] == CPNull || [_changedData objectForKey:aKey] == nil)
-		{
-			[_changedData setObject:aObject forKey:aKey];
-		}
-	}
-}
-*/
 - (void)_setChangedObject:(id) aObject forKey:(CPString) aKey
 {	
 	[_changedData setObject:aObject forKey:aKey];
