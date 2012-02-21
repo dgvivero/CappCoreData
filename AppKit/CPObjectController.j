@@ -716,7 +716,8 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
 
 - (id)_controllerMarkerForValues:(CPArray)theValues
 {
-    var count = [theValues count];
+    var count = [theValues count],
+        value;
 
     if (!count)
         value = CPNoSelectionMarker;
@@ -746,8 +747,8 @@ var CPObjectControllerContentKey                        = @"CPObjectControllerCo
 
 - (id)valueForKeyPath:(CPString)theKeyPath
 {
-    var values = [[_controller selectedObjects] valueForKeyPath:theKeyPath];
-    value = [self _controllerMarkerForValues:values];
+    var values = [[_controller selectedObjects] valueForKeyPath:theKeyPath],
+        value = [self _controllerMarkerForValues:values];
 
     [_cachedValues setObject:value forKey:theKeyPath];
 

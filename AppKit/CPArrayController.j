@@ -565,7 +565,7 @@
 - (BOOL)setSelectionIndexes:(CPIndexSet)indexes
 {
     [self _selectionWillChange]
-    var r = [self __setSelectionIndexes:indexes];
+    var r = [self __setSelectionIndexes:indexes avoidEmpty:NO];
     [self _selectionDidChange];
     return r;
 }
@@ -585,6 +585,11 @@
 */
 - (BOOL)__setSelectionIndexes:(CPIndexSet)indexes
 {
+    [self __setSelectionIndexes:indexes avoidEmpty:_avoidsEmptySelection];
+}
+
+- (BOOL)__setSelectionIndexes:(CPIndexSet)indexes avoidEmpty:(BOOL)avoidEmpty
+{
     var newIndexes = indexes;
 
     if (!newIndexes)
@@ -592,7 +597,7 @@
 
     if (![newIndexes count])
     {
-        if (_avoidsEmptySelection && [[self arrangedObjects] count])
+        if (avoidEmpty && [[self arrangedObjects] count])
             newIndexes = [CPIndexSet indexSetWithIndex:0];
     }
     else
@@ -607,7 +612,7 @@
         // Remove out of bounds indexes.
         [newIndexes removeIndexesInRange:CPMakeRange(objectsCount, [newIndexes lastIndex] + 1)];
         // When avoiding empty selection and the deleted selection was at the bottom, select the last item.
-        if (![newIndexes count] && _avoidsEmptySelection && objectsCount)
+        if (![newIndexes count] && avoidEmpty && objectsCount)
             newIndexes = [CPIndexSet indexSetWithIndex:objectsCount - 1];
     }
 
@@ -648,7 +653,7 @@
     [self willChangeValueForKey:@"selectionIndexes"];
     [self _selectionWillChange];
 
-    var r = [self __setSelectedObjects:objects];
+    var r = [self __setSelectedObjects:objects avoidEmpty:NO];
 
     [self didChangeValueForKey:@"selectionIndexes"];
     [self _selectionDidChange];
@@ -660,6 +665,11 @@
     @ignore
 */
 - (BOOL)__setSelectedObjects:(CPArray)objects
+{
+    [self __setSelectedObjects:objects avoidEmpty:_avoidsEmptySelection];
+}
+
+- (BOOL)__setSelectedObjects:(CPArray)objects avoidEmpty:(BOOL)avoidEmpty
 {
     var set = [CPIndexSet indexSet],
         count = [objects count],
@@ -673,7 +683,7 @@
             [set addIndex:index];
     }
 
-    [self __setSelectionIndexes:set];
+    [self __setSelectionIndexes:set avoidEmpty:avoidEmpty];
     return YES;
 }
 
