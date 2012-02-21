@@ -33,6 +33,12 @@
 	return self;
 }
 
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:[self name] forKey:@"NSEntityName"];
+    [aCoder encodeObject:[self externalName] forKey:@"NSClassNameForEntity"];
+}
+
 - (void)NS_loadEntityDescription
 {
 	var keyEnumerator = [ns_properties keyEnumerator];

@@ -76,5 +76,19 @@
 @implementation CPPlatform : CPBasePlatform
 {
 }
++ (void)bootstrap
+{
+    [CPPlatformString bootstrap];
+    //[CPPlatformWindow setPrimaryPlatformWindow:[[CPPlatformWindow alloc] _init]];
+}
+
++ (BOOL)isBrowser
+{
+    return NO;
+}
+
++ (void)terminateApplication
+{
+}
 @end
 #endif

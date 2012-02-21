@@ -1226,7 +1226,12 @@ var _CPAppBootstrapperActions = nil;
 
 + (CPArray)actions
 {
-    return [@selector(bootstrapPlatform), @selector(loadDefaultTheme), @selector(loadMainCibFile)];
+#if PLATFORM(DOM)
+
+	return [@selector(bootstrapPlatform), @selector(loadDefaultTheme), @selector(loadMainCibFile)];
+#else
+	return [@selector(bootstrapPlatform), @selector(loadMainCibFile)];
+#endif
 }
 
 + (void)performActions

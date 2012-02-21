@@ -995,7 +995,7 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 
 - (CPString)stringRepresentation
 {
-	var result = "CPObject " + [self couchID];
+	var result = "CPObject ";
 	
 	result = result + [_objectID stringRepresentation];
 	result = result + [_entity stringRepresentation];
@@ -1004,5 +1004,41 @@ CPManagedObjectUnexpectedValueTypeForProperty = "CPManagedObjectUnexpectedValueT
 	return result;
 }
 
+@end
+
+@implementation CPManagedObject (CPCoding)
+ 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    self = [super init];
+
+    if (self)
+   {
+       	 _entity = [aCoder decodeObjectForKey:@"CPManagedObjectObjectEntityKey"]
+		_objectID = [aCoder decodeObjectForKey:@"CPManagedObjectObjectIDKey"];
+		_isUpdated = [aCoder decodeBoolForKey:@"CPManagedObjectIsUpdatedKey"];
+		_isDeleted = [aCoder decodeBoolForKey:@"CPManagedObjectIsDeletedKey"];
+		_isFault = [aCoder decodeBoolForKey:@"CPManagedObjectIsFaultKey"];
+		
+	    _data = [aCoder decodeObjectForKey:@"CPManagedObjectDataKey"];
+		_changedData = [aCoder decodeObjectForKey:@"CPManagedObjectChangedDataKey"];		
+		 
+   }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_entity forKey:@"CPManagedObjectObjectEntityKey"];
+	[aCoder encodeObject:_objectID forKey:@"CPManagedObjectObjectIDKey"];
+	[aCoder encodeBool:_isUpdated forKey:@"CPManagedObjectIsUpdatedKey"];
+	[aCoder encodeBool:_isDeleted forKey:@"CPManagedObjectIsDeletedKey"];
+	[aCoder encodeBool:_isFault forKey:@"CPManagedObjectIsFaultKey"];
+	
+	[aCoder encodeObject:_data forKey:@"CPManagedObjectDataKey"];
+	[aCoder encodeObject:_changedData forKey:@"CPManagedObjectChangedDataKey"];
+    
+}
 
 @end

@@ -125,7 +125,26 @@
 // 	return [CPSet new];
 // }
 
+@end
 
+@implementation CPPersistantStore (CPCoding)
 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+	self = [super initWithCoder:aCoder];
 
+	if (self)
+	{		
+		_storeID = [aCoder decodeObjectForKey: @"CPPersistanStoreIDKey"];	//will set on addEntity in CPManagedObjectModel
+		_configuration = [aCoder decodeObjectForKey: @"CPPersistanStoreConfigurationKey"];
+		
+	}
+	return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_storeID forKey:@"CPPersistanStoreIDKey"];
+    [aCoder encodeObject:_configuration forKey:@"CPPersistanStoreConfigurationKey"];
+}
 @end

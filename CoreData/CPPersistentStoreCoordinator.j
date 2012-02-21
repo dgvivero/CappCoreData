@@ -91,3 +91,29 @@
 }
 
 @end
+
+@implementation CPPersistentStoreCoordinator (CPCoding)
+
+- (id)initWithCoder:(CPCoder)aCoder
+{
+	self = [super init];
+
+	if (self)
+	{		
+		_model= [aCoder decodeObjectForKey: @"CPPersistentStoreCoordinatorModelKey"];
+		_persistentStores = [aCoder decodeObjectForKey: @"CPPersistentStoreCoordinatorPersistantStoresKey"];
+		_persistantStore= [aCoder decodeObjectForKey: @"CPPersistentStoreCoordinatorPersistanStoreKey"];
+		_undoManager= [aCoder decodeObjectForKey: @"CPPersistentStoreCoordinatorUndoManagerKey"];
+		
+	}
+	return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_model forKey:@"CPPersistentStoreCoordinatorModelKey"];
+    [aCoder encodeObject:_persistentStores forKey:@"CPPersistentStoreCoordinatorPersistantStoresKey"];
+	[aCoder encodeObject:_persistantStore forKey:@"CPPersistentStoreCoordinatorPersistanStoreKey"];
+    [aCoder encodeObject:_undoManager forKey:@"CPPersistentStoreCoordinatorUndoManagerKey"];
+}
+@end

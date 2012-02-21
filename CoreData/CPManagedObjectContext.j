@@ -318,11 +318,11 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 						[[registeredObject objectID] setIsTemporary: [[objectFromResponse objectID] isTemporary]];
 					}
 				}
-				return YES;
+				//return YES;
 			}
-			if(error == nil)
+			//if(error == nil)	
 				result = [self reset];
-			
+			[_deletedObjects removeAllObjects];
 			[[CPNotificationCenter defaultCenter]
 				postNotificationName: CPManagedObjectContextDidSaveNotification
 							  object: self
@@ -790,5 +790,39 @@ CPDDeletedObjectsKey = "CPDDeletedObjectsKey";
 }
 
 
+
+@end
+
+@implementation CPManagedObjectContext (CPCoding)
+ 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    self = [super init];
+
+    if (self)
+   {
+       	_autoSaveChanges = [aCoder decodeBoolForKey:@"CPManagedObjectContextAutoSaveChangesKey"];
+		_storeCoordinator = [aCoder decodeObjectForKey:@"CPManagedObjectContextStoreCoordinatorKey"];
+	    _registeredObjects = [aCoder decodeObjectForKey:@"CPManagedObjectContextRegisteredObjectKey"];
+		_insertedObjectIDs = [aCoder decodeObjectForKey:@"CPManagedObjectContextInsertedObjectsKey"];
+		_updatedObjectIDs = [aCoder decodeObjectForKey:@"CPManagedObjectContextUpdatedObjectsKey"];
+		_deletedObjects	 = [aCoder decodeObjectForKey:@"CPManagedObjectContextDeletedObjectsKey"];
+		
+		 
+   }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeBool:_autoSaveChanges forKey:@"CPManagedObjectContextAutoSaveChangesKey"];
+    [aCoder encodeObject:_storeCoordinator forKey:@"CPManagedObjectContextStoreCoordinatorKey"];
+	[aCoder encodeObject:_registeredObjects forKey:@"CPManagedObjectContextRegisteredObjectKey"];
+	[aCoder encodeObject:_insertedObjectIDs forKey:@"CPManagedObjectContextInsertedObjectsKey"];
+	[aCoder encodeObject:_updatedObjectIDs forKey:@"CPManagedObjectContextUpdateObjectsKey"];
+	[aCoder encodeObject:_deletedObjects forKey:@"CPManagedObjectContextDeletedObjectsKey"];
+    
+}
 
 @end

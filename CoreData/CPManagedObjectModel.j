@@ -185,3 +185,27 @@ var CPDCOREDATAMODEL_SUFFIX = "cpxcdatamodel";
 	return result;
 }
 @end
+
+@implementation CPManagedObjectModel (CPCoding)
+ 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    self = [super initWithCoder:aCoder];
+
+    if (self)
+   {
+      	_name = [aCoder decodeObjectForKey:@"CPManagedObjectModelNameKey"];
+		_entities = [aCoder decodeObjectForKey:@"CPManagedObjectModelEntitiesKey"];
+	
+   }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_name forKey:@"CPManagedObjectModelNameKey"];
+    [aCoder encodeObject:_entities forKey:@"CPManagedObjectModelEntitiesKey"];
+    
+}
+@end

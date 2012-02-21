@@ -143,3 +143,33 @@
 }
 
 @end
+
+@implementation CPManagedObjectID (CPCoding)
+ 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    self = [super init];
+
+    if (self)
+   {
+       	 _entity = [aCoder decodeObjectForKey:@"CPManagedObjectObjectIDEntityKey"]
+		_globalID = [_globalID decodeObjectForKey:@"CPManagedObjectObjectIDGlobalIDKey"];
+		_localID = [aCoder decodeObjectForKey:@"CPManagedObjectIDLocalIDKey"];
+		_isTemporary = [aCoder decodeBoolForKey:@"CPManagedObjectIDIsTemporaryKey"];
+		 
+   }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_entity forKey:@"CPManagedObjectObjectIDEntityKey"];
+	[aCoder encodeObject:_globalID forKey:@"CPManagedObjectObjectIDGlobalIDKey"];
+	[aCoder encodeObject:_localID forKey:@"CPManagedObjectIDLocalIDKey"];
+	[aCoder encodeBool:_isTemporary forKey:@"CPManagedObjectIDIsTemporaryKey"];
+	
+    
+}
+
+@end

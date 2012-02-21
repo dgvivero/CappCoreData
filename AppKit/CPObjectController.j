@@ -125,7 +125,8 @@
 */
 - (id)content
 {
-    return _contentObject;
+    
+	return _contentObject;
 }
 
 /*!
@@ -373,13 +374,19 @@
 - (CPFetchRequest)defaultFetchRequest
 {
 	var anEntity = [CPEntityDescription entityForName: _entityName inManagedObjectContext: _managedContext];
-	return [[CPFetchRequest alloc] initWithEntity:anEntity	predicate:_fetchPredicate];
+	
+	return [[CPFetchRequest alloc] initWithEntity:anEntity 
+										   predicate:nil
+										   sortDescriptors:nil 
+										    fetchLimit:0];
 }
 
 
 - (BOOL)fetchWithRequest:(CPFetchRequest)fetchRequest merge:(BOOL)merge error:(CPError)error
 {	
-	var anArray = [_managedContext executeFetchRequest: fetchRequest];
+	var anArray = [_managedContext executeFetchRequest:[_managedProxy fetchRequest]];
+	//var anArray =[_managedContext  _executeStoreFetchRequest:[_managedProxy fetchRequest]];
+	[self setValue:anArray forKey:@"content"];
 	return YES
 }
 

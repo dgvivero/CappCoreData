@@ -225,3 +225,34 @@
 }
 
 @end
+
+@implementation CPEntityDescription (CPCoding)
+ 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    self = [super init];
+
+    if (self)
+   {
+       	
+		_model = [aCoder decodeObjectForKey:@"CPEntityDescriptionModelKey"]
+		_name = [aCoder decodeObjectForKey:@"CPEntityDescriptionNameKey"];
+		_externalName = [aCoder decodeObjectForKey:@"CPEntityDescriptionExternalNameKey"];
+		_properties = [aCoder decodeObjectForKey:@"CPEntityDescriptionPropertiesKey"];
+		
+		 
+   }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_model forKey:@"CPEntityDescriptionModelKey"];
+	[aCoder encodeObject:_name forKey:@"CPEntityDescriptionNameKey"];
+	[aCoder encodeObject:_externalName forKey:@"CPEntityDescriptionExternalNameKey"];
+	[aCoder encodeObject:_properties forKey:@"CPEntityDescriptionPropertiesKey"];
+    
+}
+
+@end

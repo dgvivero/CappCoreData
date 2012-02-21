@@ -315,6 +315,7 @@
     // We need to be in control of when notifications fire.
     // Note that if we have a contentArray binding, setting the content does /not/
     // cause a reverse binding set.
+	
     _contentObject = value;
 
     if (_clearsFilterPredicateOnInsertion && _filterPredicate != nil)
@@ -354,7 +355,8 @@
 */
 - (id)contentArray
 {
-    return [self content];
+    
+     return [self content];
 }
 
 /*!
@@ -406,6 +408,7 @@
     Like rearrangeObjects but don't fire any change notifications.
     @ignore
 */
+
 - (void)_rearrangeObjects
 {
     /*
@@ -481,7 +484,11 @@
 */
 - (CPPredicate)filterPredicate
 {
-    return _filterPredicate;
+    if (_managedContext){
+     	 return [_managedProxy fetchPredicate];
+    } else {
+			return _filterPredicate;
+	}
 }
 
 /*!
@@ -510,8 +517,11 @@
 {
     if (_filterPredicate === value)
         return;
-
-    _filterPredicate = value;
+	if (_managedContext){
+     	 [_managedProxy setFetchPredicate:value]
+    } else {
+		_filterPredicate = value;
+	}
     // Use the non-notification version.
     [self _rearrangeObjects];
 }
@@ -936,6 +946,7 @@
         // First try the simple case which should work if there are no sort descriptors.
         if ([_contentObject objectAtIndex:index] === object)
             [_contentObject removeObjectAtIndex:index];
+	        
         else
         {
             // Since we don't have a reverse mapping between the sorted order and the
@@ -946,6 +957,8 @@
             contentIndex = [_contentObject indexOfObjectIdenticalTo:object];
             [_contentObject removeObjectAtIndex:contentIndex];
         }
+
+		if (_managedContext) [_managedContext deleteObject:object];
         [arrangedObjects removeObjectAtIndex:index];
 
         // Deselect this row if it was selected, and either way shift all selection indexes
@@ -1169,7 +1182,8 @@ var CPArrayControllerAvoidsEmptySelection             = @"CPArrayControllerAvoid
     [self _selectionWillChange];
 	if (_isUsingManagedProxy){
 		[[self managedProxy] setValue:[self managedObjectContext] forKey:@"managedObjectContext"];
-		[self bind:@"contentArray" toObject:[self managedProxy] withKeyPath:@"itemsArray" options:nil];
+		//[self bind:@"contentArray" toObject:[self managedProxy] withKeyPath:@"itemsArray" options:nil];
+		[self fetch:nil];
 	}
     [self _selectionDidChange];
 }

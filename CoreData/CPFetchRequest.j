@@ -44,4 +44,40 @@
 	
 	return self;
 }
+
+@end
+
+var CPFetchRequestEntityKey   = @"CPFetchRequestEntityKey",
+    CPFetchRequestPredicateKey = @"CPFetchRequestPredicateKey",
+	CPFetchRequestSortDescriptorsKey  = @"CPFetchRequestSortDescriptorsKey",
+	CPFetchRequestFetchLimitKey  = @"CPFetchRequestFetchLimitKey";
+
+@implementation CPFetchRequest (CPCoding)
+ 
+-(id)initWithCoder:(CPCoder)aCoder
+{
+    self = [super init];
+
+    if (self)
+   {
+      	_entity = [aCoder decodeObjectForKey:CPFetchRequestEntityKey];
+		_predicate = [aCoder decodeObjectForKey:CPFetchRequestPredicateKey];
+		_sortDescriptors = [aCoder decodeObjectForKey:CPFetchRequestSortDescriptorsKey];
+		_fetchLimit = [aCoder decodeIntForKey:CPFetchRequestEntityKey];
+		 
+   }
+
+    return self;
+}
+
+
+
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [aCoder encodeObject:_entity forKey:CPFetchRequestEntityKey];
+    [aCoder encodeObject:_predicate forKey:CPFetchRequestPredicateKey];
+    [aCoder encodeObject:_sortDescriptors forKey:CPFetchRequestSortDescriptorsKey];
+    [aCoder encodeInt:_fetchLimit forKey:CPFetchRequestFetchLimitKey];
+}
 @end
