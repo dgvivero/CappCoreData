@@ -114,8 +114,7 @@ couchREV="couchREV";
 	if(aDictionary != nil)
 	{
 		var aModelName = [aDictionary objectForKey:CPmodelName];
-        CPLog.debug([aDictionary objectForKey:@"_id"])
-		var aModel = nil;
+        var aModel = nil;
 		if([[aContext model] isModelAllowedForMergeByName: aModelName])
 		{		
 			var aEntityName = [aDictionary objectForKey:CPEntityDescriptionName];

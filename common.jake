@@ -1,8 +1,8 @@
-var SYSTEM = require("system");
-var FILE = require("file");
-var OS = require("os");
-var UTIL = require("narwhal/util");
-var stream = require("narwhal/term").stream;
+var SYSTEM = require('sys');
+var FILE = require('fs');
+var OS = require('os');
+var UTIL = require('narwhal-lib/util');
+var stream = require('narwhal-lib/term').stream;
 
 var requiresSudo = false;
 
