@@ -45,7 +45,7 @@
 
         // Some of the item identifiers will be changed when loaded by NSToolbarItem, so we must change
         // the map to correspond.
-        while (key = [keyEnumerator nextObject])
+        while ((key = [keyEnumerator nextObject]) !== nil)
         {
             var transformedKey = NS_CPToolbarItemIdentifierMap[key] || key;
             [_identifiedItems setObject:[nsIdentifiedItems objectForKey:key] forKey:transformedKey];
@@ -54,6 +54,8 @@
         _defaultItems               = [aCoder decodeObjectForKey:"NSToolbarIBDefaultItems"];
         _allowedItems               = [aCoder decodeObjectForKey:"NSToolbarIBAllowedItems"];
         _selectableItems            = [aCoder decodeObjectForKey:"NSToolbarIBSelectableItems"];
+
+        _sizeMode                   = [aCoder decodeObjectForKey:"NSToolbarSizeMode"] || CPToolbarSizeModeDefault;
 
         _delegate                   = [aCoder decodeObjectForKey:"NSToolbarDelegate"];
     }
